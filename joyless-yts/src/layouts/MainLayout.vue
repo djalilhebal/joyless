@@ -1,16 +1,21 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar>
-        <q-toolbar-title>Joyless YTS</q-toolbar-title>
+      <q-toolbar class="bg-white">
+        <q-toolbar-title class="text-primary text-h5 text-bold">Joyless YTS</q-toolbar-title>
 
-        <q-toggle v-model="config.showSeen" />
+        <q-input color="black" label="Search" dense v-model="searchParams.searchText" placeholder="Search..." disable style="min-width: 200px"></q-input>
 
-        <q-select v-model="searchParams.genre" :options="GENRE_OPTIONS" label="Genre" emit-value map-options
-          option-value="value" option-label="label" />
+        <!-- Filters & Toggles -->
+        <div class="row items-center q-gutter-lg text-grey-9">
+          <q-toggle v-model="config.showSeen" label="Show seen" dense />
 
-        <q-select v-model="searchParams.rating" :options="RATING_OPTIONS" label="Rating" emit-value map-options option-value="value"
-          option-label="label" />
+          <q-select v-model="searchParams.genre" :options="GENRE_OPTIONS" label="Genre" emit-value map-options
+            option-value="value" option-label="label" dense style="min-width: 150px" />
+
+          <q-select v-model="searchParams.rating" :options="RATING_OPTIONS" label="Rating" emit-value map-options
+            option-value="value" option-label="label" dense style="min-width: 150px" />
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -21,7 +26,11 @@
 </template>
 
 <script setup lang="ts">
+import { setCssVar } from 'quasar';
+
 import { useAppStore } from 'src/stores/app-store';
+
+setCssVar('primary', '#6200ea');
 
 const appStore = useAppStore();
 const config = appStore.config;

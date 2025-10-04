@@ -2,6 +2,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia';
 import { ref } from 'vue';
 
 export interface SearchParams {
+  searchText: string,
   genre: string;
   rating: number;
 }
@@ -11,6 +12,7 @@ export const useAppStore = defineStore('app', () => {
     showSeen: true,
   });
   const searchParams = ref<SearchParams>({
+    searchText: '',
     genre: 'animation',
     rating: 8,
   });
