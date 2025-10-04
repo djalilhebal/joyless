@@ -1,0 +1,1 @@
+{"type":"CuckooFilter","_size":3,"_fingerprintLength":2,"_length":11,"_maxKicks":500,"_filter":[{"type":"Bucket","_size":4,"_elements":["0f","b5","bb","95"]},{"type":"Bucket","_size":4,"_elements":["ce","29","90","23"]},{"type":"Bucket","_size":4,"_elements":["63","fc","e8",null]}],"_seed":78187493520}
