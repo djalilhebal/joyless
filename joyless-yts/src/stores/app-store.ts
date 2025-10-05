@@ -1,5 +1,5 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
-import { useStorage } from '@vueuse/core'
+import { useStorage } from '@vueuse/core';
 
 import type { YtsSearchParams } from 'src/api/yts';
 

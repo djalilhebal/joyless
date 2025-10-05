@@ -32,8 +32,6 @@ Discovering stuff I have yet to see.
 
 ## Idea: Cuckoo filter
 
-[Cuckoo filter | Wikipedia](https://en.wikipedia.org/wiki/Cuckoo_filter)
-
 A Cuckoo filter is like a probabilistic set. It answers the question "Is this element in the set?" with either **No** (certain) or **Probably Yes**. \
 Meaning, there may be false positives. \
 For our use-case, we can set adjust the error rate (**false positive rate**) to 1%. \
@@ -53,7 +51,7 @@ Have I seen [_The Godfather_](https://www.imdb.com/title/tt0068646/)? Certainly 
 
 ## Implementation
 
-- [`npm:bloom-filters`](https://github.com/Callidon/bloom-filters) provies the Cuckoo filter implementation.
+- [`npm:bloom-filters`](https://github.com/Callidon/bloom-filters) provies the Bloom and Cuckoo filters.
   * [`npm:buffer`](https://github.com/feross/buffer) to polyfill `Buffer` in the browser.
   * 🟥 As of 2025-10-05, Cuckoo filter is bugged: It returns false negatives, which is unacceptable.
     We will need to [wait for the issue to be fixed](https://github.com/Callidon/bloom-filters/issues/68) or use something else.
@@ -61,6 +59,7 @@ Have I seen [_The Godfather_](https://www.imdb.com/title/tt0068646/)? Certainly 
   * 🟩 Uses xxHash.
 - [ ] [`npm:cuckoo-filter`](https://github.com/vijayee/cuckoo-filter)
   * 🟩 Supports JSON serialization.
+  * 🟧 Not maintained.
   * 🟧 Uses DJB2 Hash (the `hash` util function) and FNV Hash (specifically FNV-1a from `npm:fnv32`).
      In theory, FNV is less random and less uniform than xxHash. That could lead to more collisions and false positives in a Bloom/Cuckoo filter.
 

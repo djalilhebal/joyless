@@ -1,13 +1,9 @@
-export interface YTSMovie {
-  id: number,
-  title: string,
-  year: number,
-  imdb_code: string,
-  medium_cover_image: string,
-}
+import type { YtsMovie } from 'src/api/yts';
 
-export interface EnrichedYTSMovie extends YTSMovie {
-  coverUrl: string,
-  imdbUrl: string,
-  seen: boolean,
+export interface EnrichedYtsMovie extends YtsMovie {
+  // URN e.g. imdb:tt1234567
+  key: string;
+  coverUrl: string;
+  imdbUrl: string;
+  seen: boolean;
 }

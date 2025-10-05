@@ -88,7 +88,7 @@ export default defineConfig((/* ctx */) => {
       config: {
         brand: {
           primary: '#6200ea',
-        }
+        },
       },
 
       // iconSet: 'material-icons', // Quasar icon set
