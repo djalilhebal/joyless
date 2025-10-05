@@ -2,15 +2,15 @@
 
 import { parseArgs } from 'node:util';
 import { readFileSync, writeFileSync } from 'node:fs';
-import BloomFilters from 'bloom-filters';
 
-const { CuckooFilter } = BloomFilters;
+import BloomFilters from 'bloom-filters';
+const { BloomFilter } = BloomFilters;
 
 const { values: args } = parseArgs({
   options: {
     source: { type: 'string', default: 'sample' },
     input: { type: 'string', default: 'public/joyless.things.json' },
-    output: { type: 'string', default: 'public/joyless.cuckoo.json' },
+    output: { type: 'string', default: 'public/joyless.seen.json' },
     errorRate: { type: 'string', default: '0.01' }
   }
 });
@@ -19,11 +19,10 @@ async function main() {
   const items = await getCompletedIds(args);
 
   const errorRate = Number(args.errorRate);
-  const cuckooFilter = CuckooFilter.from(items, errorRate);
-  const json = JSON.stringify(cuckooFilter.saveAsJSON());
+  const seenFilter = BloomFilter.from(items, errorRate);
+  const json = JSON.stringify(seenFilter.saveAsJSON());
   writeFileSync(args.output, json);
 }
-
 
 async function getCompletedIds(params) {
 
@@ -83,7 +82,7 @@ async function getCompletedIds(params) {
     }
 
     case 'json': {
-      const items = JSON.parse(readFileSync(args.input, {encoding: 'utf-8'}));
+      const items = JSON.parse(readFileSync(args.input, { encoding: 'utf-8' }));
       const completedItems = items
         .filter((item) => item.status === 'done')
         .filter((item) => typeof item.labels.imdb === 'string')
