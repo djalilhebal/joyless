@@ -1,11 +1,19 @@
 // YTS API stuff
 
+export interface YtsMovie {
+  id: number;
+  title: string;
+  year: number;
+  imdb_code: string;
+  medium_cover_image: string;
+}
+
 export interface YtsSearchParams {
   genre: string;
   rating: number;
 }
 
-export async function getMovies(params: YtsSearchParams) {
+export async function getMovies(params: YtsSearchParams): Promise<YtsMovie[]> {
   const url = `https://yts.mx/api/v2/list_movies.json?genre=${params.genre}&limit=50&minimum_rating=${params.rating}&sort_by=download_count`;
   const response = await fetch(url).then((res) => res.json());
   if (response.status === 'ok') {
@@ -55,5 +63,5 @@ export const RATING_OPTIONS = [
   { value: 4, label: '4+' },
   { value: 3, label: '3+' },
   { value: 2, label: '2+' },
-  { value: 1, label: '1+' }
+  { value: 1, label: '1+' },
 ];

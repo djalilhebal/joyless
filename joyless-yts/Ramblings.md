@@ -2,6 +2,8 @@
 
 - [Bloom filter - Wikipedia](https://en.wikipedia.org/wiki/Bloom_filter)
 
+- [Cuckoo filter | Wikipedia](https://en.wikipedia.org/wiki/Cuckoo_filter)
+
 - [ ] [Static Filters (Bloom & XOR) - YouTube](https://www.youtube.com/watch?v=rarUa_jtRsw)
 
 

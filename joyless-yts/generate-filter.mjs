@@ -1,10 +1,10 @@
-// Generate joyless.cuckoo.json
+// Generate joyless.seen.json
 
 import { parseArgs } from 'node:util';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 import BloomFilters from 'bloom-filters';
-const { BloomFilter } = BloomFilters;
+const { CountingBloomFilter } = BloomFilters;
 
 const { values: args } = parseArgs({
   options: {
@@ -15,21 +15,37 @@ const { values: args } = parseArgs({
   }
 });
 
+// e.g. imdb, mal
+const RELEVANT_KEYS = ['imdb'];
+
 async function main() {
-  const items = await getCompletedIds(args);
+  console.log(`Using source: ${args.source}...`);
+  const completedKeys = await getCompletedKeys(args);
+  const uniqueKeys = [...new Set(completedKeys)];
 
   const errorRate = Number(args.errorRate);
-  const seenFilter = BloomFilter.from(items, errorRate);
-  const json = JSON.stringify(seenFilter.saveAsJSON());
-  writeFileSync(args.output, json);
+  console.log(`Generating filter for ${uniqueKeys.length} items with error rate ${errorRate}...`);
+  const seenFilter = CountingBloomFilter.from(uniqueKeys, errorRate);
+
+  console.log(`Writing filter to ${args.output}...`);
+  const content = {
+    generatedAt: (new Date()).toISOString(),
+    errorRate: errorRate,
+    itemCount: uniqueKeys.length,
+    data: seenFilter.saveAsJSON(),
+  };
+  const serialized = JSON.stringify(content);
+  writeFileSync(args.output, serialized);
+
+  console.log('Done.');
 }
 
-async function getCompletedIds(params) {
+async function getCompletedKeys(params) {
 
   switch (params.source) {
     case 'sample': {
 
-      const SAMPLE_COMPLETED_ITEMS = [
+      const SAMPLE_COMPLETED_IMDB_LINKS = [
         // --- 1980s animation ---
         // Akira
         'https://www.imdb.com/title/tt0094625/',
@@ -47,8 +63,6 @@ async function getCompletedIds(params) {
         'https://www.imdb.com/title/tt0317705/',
         // Spirited Away
         'https://www.imdb.com/title/tt0245429/',
-        // Treasure Planet
-        'https://www.imdb.com/title/tt0133240/',
 
         // --- 2010s animation ---
         // Coco
@@ -62,8 +76,9 @@ async function getCompletedIds(params) {
         // Ne Zha 2
         'https://www.imdb.com/title/tt34956443/',
       ];
+      const completedKeys = SAMPLE_COMPLETED_IMDB_LINKS.map((url) => url.replace('https://www.imdb.com/title/', 'imdb:').replace('/', ''));
 
-      return SAMPLE_COMPLETED_ITEMS;
+      return completedKeys;
     }
 
     case 'db': {
@@ -71,24 +86,32 @@ async function getCompletedIds(params) {
       process.exit(1);
       /*
       const query = `
-        SELECT url
+        SELECT 'imdb:' || imdb_code AS key
         FROM media_items
-        WHERE url IS NOT NULL
-          AND status = 'DONE'
+        WHERE status = 'done'
+          AND imdb_code IS NOT NULL
       `;
-      const items = await db.query(query);
+      const rows = await db.query(query);
+      const completedKeys = rows.map((row) => row.key);
       */
-      break;
+      return [];
     }
 
     case 'json': {
+      // Assume joyless.things.json structure
       const items = JSON.parse(readFileSync(args.input, { encoding: 'utf-8' }));
-      const completedItems = items
+      const completedKeys = items
         .filter((item) => item.status === 'done')
-        .filter((item) => typeof item.labels.imdb === 'string')
-        .map((item) => `https://www.imdb.com/title/${item.labels.imdb}/`)
-        ;
-      return completedItems;
+        .flatMap((item) => {
+          const keys = [];
+          for (const urn of RELEVANT_KEYS) {
+            if (typeof item.labels[urn] === 'string') {
+              keys.push(`${urn}:${item.labels[urn]}`);
+            }
+          }
+          return keys;
+        });
+      return completedKeys;
     }
 
     default: {
