@@ -13,10 +13,11 @@
     "dev": "quasar dev",
     "build": "quasar build",
     "postinstall": "quasar prepare",
-    "generate-cuckoo": "node generate-cuckoo.mjs"
+    "generate-filter": "node generate-filter.mjs"
   },
   "dependencies": {
     "@quasar/extras": "^1.16.4",
+    "@vueuse/core": "^13.9.0",
     "bloom-filters": "^3.0.4",
     "buffer": "^6.0.3",
     "pinia": "^3.0.1",
@@ -41,7 +42,7 @@
     "vue-tsc": "^3.0.7"
   },
   "engines": {
-    "node": "^28 || ^26 || ^24 || ^22 || ^20",
+    "node": ">=22.19.0",
     "npm": ">= 6.13.4",
     "yarn": ">= 1.21.1"
   }

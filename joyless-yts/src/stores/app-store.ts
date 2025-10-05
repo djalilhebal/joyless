@@ -1,18 +1,13 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
-import { ref } from 'vue';
+import { useStorage } from '@vueuse/core'
 
-export interface SearchParams {
-  searchText: string,
-  genre: string;
-  rating: number;
-}
+import type { YtsSearchParams } from 'src/api/yts';
 
 export const useAppStore = defineStore('app', () => {
-  const config = ref({
+  const config = useStorage('joyless:config', {
     showSeen: true,
   });
-  const searchParams = ref<SearchParams>({
-    searchText: '',
+  const searchParams = useStorage<YtsSearchParams>('joyless:searchParams', {
     genre: 'animation',
     rating: 8,
   });

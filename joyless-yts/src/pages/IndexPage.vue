@@ -20,15 +20,16 @@
 
 <script setup lang="ts">
 import { computed, onMounted, shallowRef, watch } from 'vue';
-import { CuckooFilter } from 'bloom-filters';
+import { BloomFilter } from 'bloom-filters';
 
 import type { EnrichedYTSMovie, YTSMovie } from 'src/components/models';
-import { useAppStore, type SearchParams } from 'src/stores/app-store';
+import { useAppStore } from 'src/stores/app-store';
+import { getMovies, type YtsSearchParams } from 'src/api/yts';
 
 const appStore = useAppStore();
 const searchParams = appStore.searchParams;
 
-const cuckooFilter = shallowRef<InstanceType<typeof CuckooFilter>>();
+const seenFilter = shallowRef<InstanceType<typeof BloomFilter>>();
 
 const searchResults = shallowRef<YTSMovie[]>();
 
@@ -41,7 +42,7 @@ const enrichedResults = computed<EnrichedYTSMovie[]>(() => {
   }));
   const withSeen = withImdbUrls?.map((movie) => ({
     ...movie,
-    seen: cuckooFilter.value?.has(movie.imdbUrl) ?? false,
+    seen: seenFilter.value?.has(movie.imdbUrl) ?? false,
   }));
   return withSeen ?? [];
 });
@@ -54,20 +55,20 @@ const filteredResults = computed(() => {
   }
 });
 
-async function loadCuckoo() {
-  const response = await fetch('/joyless.cuckoo.json');
+async function loadSeenFilter() {
+  const response = await fetch('/joyless.seen.json');
   const json = await response.json();
-  cuckooFilter.value = CuckooFilter.fromJSON(json);
+  seenFilter.value = BloomFilter.fromJSON(json);
 }
 
-async function loadResults(params: SearchParams) {
-  searchResults.value = [];
-  await fetch(`https://yts.mx/api/v2/list_movies.json?genre=${params.genre}&limit=50&minimum_rating=${params.rating}&sort_by=download_count`)
-    .then((response) => response.json())
-    .then((payload) => {
-      console.debug('payload', payload);
-      searchResults.value = payload.data.movies;
-    });
+async function loadResults(params: YtsSearchParams) {
+  try {
+    searchResults.value = [];
+    searchResults.value = await getMovies(params);
+  } catch (e) {
+    console.error('Failed to load search results', e);
+    return;
+  }
 }
 
 watch(
@@ -82,7 +83,7 @@ watch(
 )
 
 onMounted(async () => {
-  await loadCuckoo();
+  await loadSeenFilter();
 });
 </script>
 
